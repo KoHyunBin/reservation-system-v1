@@ -1,4 +1,4 @@
-package com.reservation.reservation_system.reservation.dto;
+package com.reservation.reservation_system.reservation.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

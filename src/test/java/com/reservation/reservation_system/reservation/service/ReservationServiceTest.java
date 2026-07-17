@@ -6,13 +6,12 @@ import com.reservation.reservation_system.member.entity.Member;
 import com.reservation.reservation_system.member.repository.MemberRepository;
 import com.reservation.reservation_system.product.entity.Product;
 import com.reservation.reservation_system.product.repository.ProductRepository;
-import com.reservation.reservation_system.reservation.dto.ReservationCreateRequest;
-import com.reservation.reservation_system.reservation.dto.ReservationResponse;
+import com.reservation.reservation_system.reservation.dto.request.ReservationCreateRequest;
+import com.reservation.reservation_system.reservation.dto.response.ReservationResponse;
 import com.reservation.reservation_system.reservation.entity.Reservation;
 import com.reservation.reservation_system.reservation.entity.ReservationStatus;
 import com.reservation.reservation_system.reservation.repository.ReservationRepository;
 import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  *

@@ -1,4 +1,4 @@
-package com.reservation.reservation_system.reservation.dto;
+package com.reservation.reservation_system.reservation.dto.response;
 
 import com.reservation.reservation_system.reservation.entity.Reservation;
 import com.reservation.reservation_system.reservation.entity.ReservationStatus;

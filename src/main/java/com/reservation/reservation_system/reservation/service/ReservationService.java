@@ -1,11 +1,14 @@
 package com.reservation.reservation_system.reservation.service;
 
+import com.reservation.reservation_system.common.exception.reservation.ReservationErrorCode;
+import com.reservation.reservation_system.common.exception.reservation.ReservationException;
 import com.reservation.reservation_system.member.entity.Member;
 import com.reservation.reservation_system.member.repository.MemberRepository;
 import com.reservation.reservation_system.product.entity.Product;
 import com.reservation.reservation_system.product.repository.ProductRepository;
-import com.reservation.reservation_system.reservation.dto.ReservationCreateRequest;
-import com.reservation.reservation_system.reservation.dto.ReservationResponse;
+import com.reservation.reservation_system.reservation.dto.response.ReservationDetailResponse;
+import com.reservation.reservation_system.reservation.dto.request.ReservationCreateRequest;
+import com.reservation.reservation_system.reservation.dto.response.ReservationResponse;
 import com.reservation.reservation_system.reservation.entity.Reservation;
 import com.reservation.reservation_system.reservation.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
@@ -77,5 +80,12 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("예약이 존재하지 않습니다."));
 
         reservation.cancel();
+    }
+
+    @Transactional(readOnly = true)
+    public ReservationDetailResponse findReservation(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(()-> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+        return ReservationDetailResponse.from(reservation);
     }
 }
