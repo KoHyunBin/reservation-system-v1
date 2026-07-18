@@ -1,9 +1,14 @@
 spring:
+  config:
+    import: optional:file:.env[.properties]
+
   datasource:
     url: jdbc:h2:tcp://localhost/~/reservation-system
-    username: sa
-    password: 4130
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.h2.Driver
+
+
 
   h2:
     console:
