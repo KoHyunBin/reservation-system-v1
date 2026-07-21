@@ -1,6 +1,7 @@
 package com.reservation.reservation_system.reservation.controller;
 
-import com.reservation.reservation_system.common.exception.GlobalExceptionHandler;
+import com.reservation.reservation_system.common.exception.member.MemberErrorCode;
+import com.reservation.reservation_system.common.exception.member.MemberException;
 import com.reservation.reservation_system.common.exception.reservation.ReservationErrorCode;
 import com.reservation.reservation_system.common.exception.reservation.ReservationException;
 import com.reservation.reservation_system.reservation.service.ReservationService;
@@ -13,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;

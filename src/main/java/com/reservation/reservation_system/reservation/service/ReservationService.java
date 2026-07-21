@@ -1,5 +1,7 @@
 package com.reservation.reservation_system.reservation.service;
 
+import com.reservation.reservation_system.common.exception.member.MemberErrorCode;
+import com.reservation.reservation_system.common.exception.member.MemberException;
 import com.reservation.reservation_system.common.exception.reservation.ReservationErrorCode;
 import com.reservation.reservation_system.common.exception.reservation.ReservationException;
 import com.reservation.reservation_system.member.entity.Member;
@@ -9,11 +11,15 @@ import com.reservation.reservation_system.product.repository.ProductRepository;
 import com.reservation.reservation_system.reservation.dto.response.ReservationDetailResponse;
 import com.reservation.reservation_system.reservation.dto.request.ReservationCreateRequest;
 import com.reservation.reservation_system.reservation.dto.response.ReservationResponse;
+import com.reservation.reservation_system.reservation.dto.response.ReservationSummaryResponse;
 import com.reservation.reservation_system.reservation.entity.Reservation;
 import com.reservation.reservation_system.reservation.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -85,7 +91,30 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public ReservationDetailResponse findReservation(Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(()-> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
         return ReservationDetailResponse.from(reservation);
+    }
+
+    //예약 목록 조회
+    @Transactional(readOnly = true)
+    public List<ReservationSummaryResponse> findReservationsByMemberId(Long memberId) {
+        //회원테이블에 회원이 있는지 확인한다 회원이 없으면 예외 발생
+        memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+
+        //해당 회원에 예약 목록 건수 조회
+        List<Reservation> reservations = reservationRepository.findAllByMemberId(memberId);
+
+        //예약 목록 건수를 담을 List 응답 객체 생성
+        List<ReservationSummaryResponse> responses = new ArrayList<>();
+
+        //List 예약 목록 객체를 List 응답 객체에 담아야한다.
+        //예약 목록 객체들을 한번 씩 순회하면서 예약 객체로 생성하고
+        //예약 객체를 List 응답 객체에 추가한고 responses를 반환한다.
+        for (Reservation reservation : reservations) {
+            ReservationSummaryResponse response = ReservationSummaryResponse.from(reservation);
+            responses.add(response);
+        }
+        return responses;
     }
 }

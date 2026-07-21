@@ -245,6 +245,4 @@ class ReservationServiceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("예약이 존재하지 않습니다.");
     }
-
-
 }
