@@ -3,11 +3,15 @@ package com.reservation.reservation_system.reservation.controller;
 import com.reservation.reservation_system.reservation.dto.response.ReservationDetailResponse;
 import com.reservation.reservation_system.reservation.dto.request.ReservationCreateRequest;
 import com.reservation.reservation_system.reservation.dto.response.ReservationResponse;
+import com.reservation.reservation_system.reservation.dto.response.ReservationSummaryResponse;
+import com.reservation.reservation_system.reservation.entity.Reservation;
 import com.reservation.reservation_system.reservation.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/reservations")
@@ -32,5 +36,12 @@ public class ReservationController {
     public ResponseEntity<ReservationDetailResponse> findReservation(@PathVariable Long reservationId) {
         ReservationDetailResponse response = reservationService.findReservation(reservationId);
         return ResponseEntity.ok(response);
+    }
+
+    //회원 예약 목록 api
+    @GetMapping("/members/{memberId}")
+    public ResponseEntity<List<ReservationSummaryResponse>> findReservationsByMemberId(@PathVariable Long memberId) {
+        List<ReservationSummaryResponse> responses = reservationService.findReservationsByMemberId(memberId);
+        return ResponseEntity.ok(responses);
     }
 }
