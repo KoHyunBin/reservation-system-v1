@@ -121,7 +121,12 @@ public class ReservationService {
     //회원 예약 목록 조회 N+1 문제 재현
     @Transactional(readOnly = true)
     public List<ReservationDetailResponse> findMemberReservations(Long memberId) {
-        List<Reservation> reservations = reservationRepository.findAllByMemberId(memberId);
+
+        // 회원 예약 목록 조회 시 N+1 문제
+//      List<Reservation> reservations = reservationRepository.findAllByMemberId(memberId);
+
+        // 패치 조인을 적용 한 회원 예약 목록 조회
+        List<Reservation> reservations = reservationRepository.findAllByMemberIdWithFetchJoin(memberId);
 
         List<ReservationDetailResponse> responses = new ArrayList<>();
 
