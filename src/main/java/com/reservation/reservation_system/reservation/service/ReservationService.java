@@ -117,4 +117,18 @@ public class ReservationService {
         }
         return responses;
     }
+
+    //회원 예약 목록 조회 N+1 문제 재현
+    @Transactional(readOnly = true)
+    public List<ReservationDetailResponse> findMemberReservations(Long memberId) {
+        List<Reservation> reservations = reservationRepository.findAllByMemberId(memberId);
+
+        List<ReservationDetailResponse> responses = new ArrayList<>();
+
+        for (Reservation reservation : reservations) {
+            ReservationDetailResponse response = ReservationDetailResponse.from(reservation);
+            responses.add(response);
+        }
+        return responses;
+    }
 }
