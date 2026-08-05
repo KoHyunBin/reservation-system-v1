@@ -7,6 +7,7 @@ import com.reservation.reservation_system.member.repository.MemberRepository;
 import com.reservation.reservation_system.product.entity.Product;
 import com.reservation.reservation_system.product.repository.ProductRepository;
 import com.reservation.reservation_system.reservation.dto.request.ReservationCreateRequest;
+import com.reservation.reservation_system.reservation.dto.response.ReservationDetailResponse;
 import com.reservation.reservation_system.reservation.dto.response.ReservationResponse;
 import com.reservation.reservation_system.reservation.entity.Reservation;
 import com.reservation.reservation_system.reservation.entity.ReservationStatus;
@@ -17,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -244,5 +247,32 @@ class ReservationServiceTest {
         assertThatThrownBy(() -> reservationService.cancel(999L))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("예약이 존재하지 않습니다.");
+    }
+
+    @Test
+    @DisplayName("회원 예약 목록 조회 N+1 문제 재현")
+    void member_reservations_n_plus_one() {
+        //given
+        Member member = memberRepository.save(Member.create("현빈","khb4130@naver.com"));
+
+        Product product1 = productRepository.save(Product.create("맥북", 10000, 10));
+        Product product2 = productRepository.save(Product.create("아이폰17", 10000, 10));
+        Product product3 = productRepository.save(Product.create("에어팟프로", 10000, 10));
+
+        reservationRepository.save(Reservation.create(member, product1));
+        reservationRepository.save(Reservation.create(member, product2));
+        reservationRepository.save(Reservation.create(member, product3));
+
+        em.flush(); //영속성 컨텍스트의 insert 내용 반영
+        em.clear(); //영속성 컨텍스트 1차 캐시 비운다
+
+        //when
+        List<ReservationDetailResponse> responses = reservationService.findMemberReservations(member.getId());
+
+        //then
+        assertThat(responses).hasSize(3);
+        assertThat(responses)
+                .extracting(ReservationDetailResponse::getProductName)
+                .containsExactlyInAnyOrder("맥북","아이폰17","에어팟프로");
     }
 }

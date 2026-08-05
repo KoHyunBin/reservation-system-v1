@@ -117,4 +117,26 @@ public class ReservationService {
         }
         return responses;
     }
+
+    //회원 예약 목록 조회 N+1 문제 재현
+    @Transactional(readOnly = true)
+    public List<ReservationDetailResponse> findMemberReservations(Long memberId) {
+
+        // 회원 예약 목록 조회 시 N+1 문제
+//      List<Reservation> reservations = reservationRepository.findAllByMemberId(memberId);
+
+        // 패치 조인을 적용 한 회원 예약 목록 조회
+//      List<Reservation> reservations = reservationRepository.findAllByMemberIdWithFetchJoin(memberId);
+
+        // EntityGraph 적용 한 회원 예약 목록 조회
+        List<Reservation> reservations = reservationRepository.findAllWithEntityGraphByMemberId(memberId);
+
+        List<ReservationDetailResponse> responses = new ArrayList<>();
+
+        for (Reservation reservation : reservations) {
+            ReservationDetailResponse response = ReservationDetailResponse.from(reservation);
+            responses.add(response);
+        }
+        return responses;
+    }
 }
