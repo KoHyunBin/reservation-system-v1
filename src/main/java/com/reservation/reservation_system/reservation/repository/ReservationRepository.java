@@ -29,4 +29,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     //로딩 전략은 @EntityGraph가 담당하고 핵심은 attributePaths -> member 와 product 함께 로딩
     @EntityGraph(attributePaths = {"member", "product"})
     List<Reservation> findAllWithEntityGraphByMemberId(Long memberId);
+
+    long countByProductId(Long id);
 }
