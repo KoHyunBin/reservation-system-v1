@@ -41,31 +41,27 @@ public class ReservationService {
         Member member = memberRepository.findById(request.getMemberId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
-        /**
-         * product 조회 시 -> 영속성 컨텍스트에 저장
-         * jpa는 product의 최초 상태를 스냅샷으로 저장
-         * stockQuantity가 100이면 100으로 저장
-         */
-        Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 상품입니다."));
+        // DB에서 재고 확인 과 재고 감소 하나의 UPDATE로 처리
+        // 정상 수행 시 결과 값 1 반환 - 예약 생성
+        // 정상 수행 실패 시 결과 값 0 반환  - 예외 처리
+        // 왜 update를 하는데 재고 감소와 재고 확인을 할 수 있는건가 조건 때문에?
+        int affectedRows = productRepository.decreaseStockAtomically(request.getProductId());
 
-        /**
-         * 해당상품 현재 재고에서 감소
-         * productRepository.save(product)를 하지 않는다
-         * 그런데도 DB에 재고 감소가 반영된다
-         * 왜? product가 트랜잭션 안에서 조회된 영속 상태 entity이기 때문이다
-         * 메서드를 실행해도 DB UPDATE가 바로 나가지 않는다
-         * 그냥 자바 객체 값만 바뀐다.
-         * stockQuantity = 99
-         */
-        try {
-            product.decreaseStock();
-        } catch (IllegalStateException e) {
-            // Product는 재고 부족을 IllegalStateException으로 알린다.
-            // 서비스에서는 이를 예약 도메인의 표준 비즈니스 예외로 변환한다.
-            // 따라서 Controller와 테스트는 예외 메시지가 아닌 에러 코드로 원인을 구분할 수 있다.
+        // 재고 부족 예외 처리
+        if(affectedRows == 0) {
             throw new ReservationException(ReservationErrorCode.INSUFFICIENT_STOCK);
         }
+
+        /**
+         * 재고 감소가 성공한 경우에만 Product 객체를 얻는다.
+         * getReferenceById()는 일반적으로 즉시 select 하지 않고
+         * 연관관계 설정에 사용할 프록시를 반환한다.
+         */
+        Product product = productRepository.getReferenceById(request.getProductId());
+
+        /**
+         * 재고 감소 성공 시 예약 생성한다
+         */
 
         // 회원이 상품을 예약 성공하면 예약엔티티 값을 넣는다
         Reservation reservation = Reservation.create(member, product);
