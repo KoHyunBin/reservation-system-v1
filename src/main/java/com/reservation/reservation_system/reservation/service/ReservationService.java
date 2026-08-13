@@ -58,7 +58,14 @@ public class ReservationService {
          * 그냥 자바 객체 값만 바뀐다.
          * stockQuantity = 99
          */
-        product.decreaseStock();
+        try {
+            product.decreaseStock();
+        } catch (IllegalStateException e) {
+            // Product는 재고 부족을 IllegalStateException으로 알린다.
+            // 서비스에서는 이를 예약 도메인의 표준 비즈니스 예외로 변환한다.
+            // 따라서 Controller와 테스트는 예외 메시지가 아닌 에러 코드로 원인을 구분할 수 있다.
+            throw new ReservationException(ReservationErrorCode.INSUFFICIENT_STOCK);
+        }
 
         // 회원이 상품을 예약 성공하면 예약엔티티 값을 넣는다
         Reservation reservation = Reservation.create(member, product);
